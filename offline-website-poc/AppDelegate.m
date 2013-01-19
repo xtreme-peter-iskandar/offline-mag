@@ -17,7 +17,13 @@
     // Override point for customization after application launch.
     MainViewController* vc = [[MainViewController alloc] initWithNibName:@"MainViewController" bundle:nil];
     [[MagazineAPIManager sharedInstance] setDelegate:vc];
-    [[MagazineAPIManager sharedInstance] retrieveMagazineMetadata];
+    
+    if(![[MagazineAPIManager sharedInstance] magazineDownloaded]){
+        
+        [[MagazineAPIManager sharedInstance] retrieveMagazineMetadata];
+    }else{
+        [vc displayMagazine];
+    }
     [self.window setRootViewController:vc];
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];

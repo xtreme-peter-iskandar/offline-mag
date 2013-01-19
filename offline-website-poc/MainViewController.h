@@ -12,6 +12,6 @@
 @interface MainViewController : UIViewController<UIWebViewDelegate,MagazineAPIManagerDelegate>
 @property (weak, nonatomic) IBOutlet UIWebView *mainWebView;
 
-
+- (void) displayMagazine;
 
 @end

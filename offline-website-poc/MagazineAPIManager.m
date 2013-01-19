@@ -56,32 +56,19 @@ static MagazineAPIManager *instance;
 
         NSDictionary* responseDict = (NSDictionary*)JSON;
         [self populateObjectFromJSON:responseDict];
-        
-        Page* page = (Page*)[self.metadata.pages objectAtIndex:0];
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString  *documentsDirectory = [paths objectAtIndex:0];
 
-        NSString *stringURL = page.htmlFileUrl;
-        NSURL  *url = [NSURL URLWithString:stringURL];
-        NSData *urlData = [NSData dataWithContentsOfURL:url];
-        if ( urlData )
-        {
-            NSString  *filePath = [NSString stringWithFormat:@"%@/%@", documentsDirectory,@"filename.html"];
-//            if([])
-            NSLog(@"%@",filePath);
-            [urlData writeToFile:filePath atomically:YES];
-        }
-        for (Content* content in page.contentUrls) { 
-            NSURL  *contenturlurl = [NSURL URLWithString:content.contentUrl];
-            NSData *contenturlData = [NSData dataWithContentsOfURL:contenturlurl];
-            if ( contenturlData )
-            {
-                NSString  *filePath = [NSString stringWithFormat:@"%@/%@", documentsDirectory,content.contentName];
-                            NSLog(@"%@",filePath);
-                [contenturlData writeToFile:filePath atomically:YES];
-            }
-        }
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
         
+        for (Page* page in self.metadata.pages) {
+
+            [self downloadHtmlFile:page path:documentsDirectory];
+            for (Content* content in page.contentUrls) {
+                [self downloadFile:content directory:documentsDirectory];
+            }
+
+        }
+        [self setMagazineDownload:YES];
         if (_delegate && [_delegate respondsToSelector:@selector(magazineMetadataLoaded)]) {
             [_delegate magazineMetadataLoaded];
         }
@@ -93,6 +80,46 @@ static MagazineAPIManager *instance;
     [op start];
 }
 
+- (void) downloadFile:(Content*) content directory:(NSString*) path{
+     NSString  *filePath = [NSString stringWithFormat:@"%@/%@", path,content.contentName];
+    if(![[NSFileManager defaultManager] fileExistsAtPath:filePath]){
+        NSURL  *contenturlurl = [NSURL URLWithString:content.contentUrl];
+        NSData *contenturlData = [NSData dataWithContentsOfURL:contenturlurl];
+        if ( contenturlData )
+        {
+            [contenturlData writeToFile:filePath atomically:YES];
+        }
+    }
+    
+    
+    
+}
+
+- (void) downloadHtmlFile: (Page*) page path:(NSString*) path{
+    NSString  *filePath = [NSString stringWithFormat:@"%@/%@", path,page.htmlFileName];
+    if(![[NSFileManager defaultManager] fileExistsAtPath:filePath]){
+       NSString *stringURL = page.htmlFileUrl;
+       NSURL  *url = [NSURL URLWithString:stringURL];
+       NSData *urlData = [NSData dataWithContentsOfURL:url];
+       if ( urlData )
+       {
+           [urlData writeToFile:filePath atomically:YES];
+       }
+    }
+}
+
+- (void) setMagazineDownload:(BOOL)isDownloaded{
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:[NSNumber numberWithBool:isDownloaded] forKey:@"MAGAZINE_DOWNLOADED"];
+    [ud synchronize];
+}
+
+- (BOOL) magazineDownloaded{
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    return [[ud objectForKey:@"MAGAZINE_DOWNLOADED"] boolValue];
+//    [ud setObject:[NSNumber numberWithBool:isDownloaded] forKey:@"MAGAZINE_DOWNLOADED"];
+    
+}
 - (BOOL)populateObjectFromJSON:(NSDictionary*)data{
     
     self.metadata = [[MagazineMetaData alloc] init];

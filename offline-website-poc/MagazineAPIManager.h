@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "Constants.h"
 #import "MagazineMetaData.h"
+#import "Utility.h"
 
 @protocol MagazineAPIManagerDelegate <NSObject>
 @optional
@@ -22,4 +23,5 @@
 @property (nonatomic, weak) id<MagazineAPIManagerDelegate> delegate;
 -(void) retrieveMagazineMetadata;
 - (BOOL)populateObjectFromJSON:(NSDictionary*)data;
+- (BOOL) magazineDownloaded;
 @end

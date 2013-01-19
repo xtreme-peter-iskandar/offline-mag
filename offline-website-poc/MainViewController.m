@@ -26,7 +26,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-   
+    [self.mainWebView setDelegate:self];
 //    NSString *fullURL = @"http://conecode.com";
 //    NSURL *url = [NSURL URLWithString:fullURL];
 //    NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
@@ -42,6 +42,7 @@
 
 #pragma mark - UIWebViewDelegate
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
+    NSLog(@"requesting: %@",request);
     return YES;
 }
 - (void)webViewDidStartLoad:(UIWebView *)webView{
@@ -54,10 +55,7 @@
     
 }
 
-#pragma mark -MagazineDelegate
-- (void) magazineMetadataLoaded{
-    NSLog(@"MagazineLoaded");
-    
+- (void) displayMagazine{
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *cachePath = [paths objectAtIndex:0];
     BOOL isDir = NO;
@@ -67,13 +65,20 @@
         [[NSFileManager defaultManager] createDirectoryAtPath:cachePath withIntermediateDirectories:NO attributes:nil error:&error];
     }
     
-    NSString *path_to_file = [cachePath stringByAppendingPathComponent:@"filename.html"];
-
+    NSString *path_to_file = [cachePath stringByAppendingPathComponent:@"letter.html"];
+    
     
     NSURL *targetURL = [NSURL fileURLWithPath:path_to_file];
     NSURLRequest *request = [NSURLRequest requestWithURL:targetURL];
     [self.mainWebView loadRequest:request];
+
 }
+
+#pragma mark -MagazineDelegate
+- (void) magazineMetadataLoaded{
+    NSLog(@"MagazineLoaded");
+    [self displayMagazine];
+    }
 - (void) magazineMetadataFailedToLoad:(NSError*)error{
     NSLog(@"MagazineFailedLoaded");
 }
