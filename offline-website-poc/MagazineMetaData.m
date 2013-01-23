@@ -7,7 +7,7 @@
 //
 
 #import "MagazineMetaData.h"
-
+#import "Page.h"
 @implementation MagazineMetaData
 - (id)init
 {
@@ -18,6 +18,15 @@
     return self;
 }
 - (BOOL)populateObjectFromJSON:(NSDictionary*)data{
+    self.version = [data objectForKey:@"version"];
+    NSArray* pagesArray = [data objectForKey:@"pages"];
+    NSMutableArray* pages = [[NSMutableArray alloc] init];
+    for (NSDictionary* pageDict in pagesArray) {
+        Page* page = [[Page alloc] init];
+        [page populateObjectFromJSON:pageDict];
+        [pages addObject:page];
+    }
+    self.pages = pages;
     return YES;
 }
 

@@ -53,22 +53,46 @@ static MagazineAPIManager *instance;
     NSMutableURLRequest *request = [self getMutableURLRequest:shopListUrl];
     
     AFJSONRequestOperation *op = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
-
+        
         NSDictionary* responseDict = (NSDictionary*)JSON;
         [self populateObjectFromJSON:responseDict];
-
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *documentsDirectory = [paths objectAtIndex:0];
         
-        for (Page* page in self.metadata.pages) {
+        NSLog(@"current: %@ api: %@", [self magazineDownloadedVersion], self.metadata.version);
+        if(![self magazineDownloaded]){
+            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+            NSString *documentsDirectory = [paths objectAtIndex:0];
+            
+            for (Page* page in self.metadata.pages) {
 
-            [self downloadHtmlFile:page path:documentsDirectory];
-            for (Content* content in page.contentUrls) {
-                [self downloadFile:content directory:documentsDirectory];
+                [self downloadHtmlFile:page path:documentsDirectory];
+                for (Content* content in page.contentUrls) {
+                    [self downloadFile:content directory:documentsDirectory];
+                }
+
             }
-
+            [self setMagazineDownload:YES version:self.metadata.version];
+            
         }
-        [self setMagazineDownload:YES];
+        else if([[self magazineDownloadedVersion] integerValue] < [self.metadata.version integerValue]){
+            
+            
+            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+            NSString *documentsDirectory = [paths objectAtIndex:0];
+            NSString  *filePath = [NSString stringWithFormat:@"%@/*", documentsDirectory];
+            NSError* error;
+            [[NSFileManager defaultManager] removeItemAtPath:filePath error:&error];
+            
+            for (Page* page in self.metadata.pages) {
+                
+                [self downloadHtmlFile:page path:documentsDirectory];
+                for (Content* content in page.contentUrls) {
+                    [self downloadFile:content directory:documentsDirectory];
+                }
+                
+            }
+            [self setMagazineDownload:YES version:self.metadata.version];
+        }
+        
         if (_delegate && [_delegate respondsToSelector:@selector(magazineMetadataLoaded)]) {
             [_delegate magazineMetadataLoaded];
         }
@@ -108,29 +132,32 @@ static MagazineAPIManager *instance;
     }
 }
 
-- (void) setMagazineDownload:(BOOL)isDownloaded{
+- (void) setMagazineDownload:(BOOL)isDownloaded version:(NSNumber*) version{
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    [ud setObject:[NSNumber numberWithBool:isDownloaded] forKey:@"MAGAZINE_DOWNLOADED"];
+    [ud setObject:[NSNumber numberWithBool:isDownloaded] forKey:kMAGAZINE_DOWNLOADED];
+    [ud setObject:version forKey:kMAGAZINE_VERSION];
+    [ud synchronize];
+}
+
+- (void) setVersion:(NSNumber*) version{
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:version forKey:kMAGAZINE_VERSION];
     [ud synchronize];
 }
 
 - (BOOL) magazineDownloaded{
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    return [[ud objectForKey:@"MAGAZINE_DOWNLOADED"] boolValue];
-//    [ud setObject:[NSNumber numberWithBool:isDownloaded] forKey:@"MAGAZINE_DOWNLOADED"];
-    
+    return [[ud objectForKey:kMAGAZINE_DOWNLOADED] boolValue];
+}
+
+- (NSNumber*) magazineDownloadedVersion{
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    return [ud objectForKey:kMAGAZINE_VERSION];
 }
 - (BOOL)populateObjectFromJSON:(NSDictionary*)data{
     
     self.metadata = [[MagazineMetaData alloc] init];
-    NSArray* pagesArray = [data objectForKey:@"pages"];
-    NSMutableArray* pages = [[NSMutableArray alloc] init];
-    for (NSDictionary* pageDict in pagesArray) {
-        Page* page = [[Page alloc] init];
-        [page populateObjectFromJSON:pageDict];
-        [pages addObject:page];
-    }
-    self.metadata.pages = pages;
+    [self.metadata populateObjectFromJSON:data];
     
     return YES;
 }

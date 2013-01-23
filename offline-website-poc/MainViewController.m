@@ -7,7 +7,7 @@
 //
 
 #import "MainViewController.h"
-
+#import "Page.h"
 @interface MainViewController ()
 
 @end
@@ -19,6 +19,10 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+        self.swipeView = [[SwipeView alloc] initWithFrame:CGRectMake(0, 0, 1024, 748)];
+//        [self.swipeView setAutoresizingMask:UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth];
+        [self.swipeView setDataSource:self];
+        [self.swipeView setDelegate:self];
     }
     return self;
 }
@@ -26,12 +30,14 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [self.mainWebView setDelegate:self];
-//    NSString *fullURL = @"http://conecode.com";
-//    NSURL *url = [NSURL URLWithString:fullURL];
-//    NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
-//    [self.mainWebView loadRequest:requestObj];
-    // Do any additional setup after loading the view from its nib.
+    
+       NSLog(@"delegate set");
+    [self.view addSubview:self.swipeView];
+//    if(self.queueToDisplay){
+//        [self displayMagazine];
+//    }
+    NSLog(@"view did load");
+
 }
 
 - (void)didReceiveMemoryWarning
@@ -55,7 +61,7 @@
     
 }
 
-- (void) displayMagazine{
+- (void) displayMagazine:(NSString*)filename webView:(UIWebView*)webView{
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *cachePath = [paths objectAtIndex:0];
     BOOL isDir = NO;
@@ -65,21 +71,63 @@
         [[NSFileManager defaultManager] createDirectoryAtPath:cachePath withIntermediateDirectories:NO attributes:nil error:&error];
     }
     
-    NSString *path_to_file = [cachePath stringByAppendingPathComponent:@"letter.html"];
     
     
+    NSString *path_to_file = [cachePath stringByAppendingPathComponent:filename];
+    if([[NSFileManager defaultManager] fileExistsAtPath:path_to_file]){
+        NSLog(@"file exists");
+    }
     NSURL *targetURL = [NSURL fileURLWithPath:path_to_file];
+    NSLog(@"target: %@", targetURL );
     NSURLRequest *request = [NSURLRequest requestWithURL:targetURL];
-    [self.mainWebView loadRequest:request];
+    [webView loadRequest:request];
+//    [webView reload];
 
 }
 
 #pragma mark -MagazineDelegate
 - (void) magazineMetadataLoaded{
     NSLog(@"MagazineLoaded");
-    [self displayMagazine];
-    }
+    [self.swipeView reloadData];
+//    [self displayMagazine];
+}
 - (void) magazineMetadataFailedToLoad:(NSError*)error{
     NSLog(@"MagazineFailedLoaded");
+}
+
+#pragma mark - swipeviewdata
+- (NSInteger)numberOfItemsInSwipeView:(SwipeView *)swipeView{
+    return [[MagazineAPIManager sharedInstance].metadata.pages count];
+}
+- (UIView *)swipeView:(SwipeView *)swipeView viewForItemAtIndex:(NSInteger)index reusingView:(UIView *)view{
+     Page* page = (Page*)[[MagazineAPIManager sharedInstance].metadata.pages objectAtIndex:index];
+    if(view == nil){
+        NSLog(@"view nil");
+        UIScrollView *scrollView = nil;
+        UIWebView* webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 1024, 748)];
+        
+        if ([webView  respondsToSelector:@selector(scrollView)]) { //iOS 5+
+            scrollView = webView.scrollView;
+        }
+        
+        scrollView.scrollEnabled = NO;
+        scrollView.bounces = NO;
+        scrollView.backgroundColor=[UIColor clearColor];
+        [self displayMagazine:page.htmlFileName webView:webView];
+        return webView;
+    }
+    else{
+      NSLog(@"view not nill");
+        NSLog(@"%@",[view class]);
+        [self displayMagazine:page.htmlFileName webView:(UIWebView*)view];
+        return view;
+    }
+       
+    
+    
+    
+   
+//    [self.mainWebView setDelegate:self];
+
 }
 @end

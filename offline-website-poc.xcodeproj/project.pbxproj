@@ -33,6 +33,7 @@
 		3FBB22B016A9D84E008DBBF0 /* Content.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FBB22AF16A9D84E008DBBF0 /* Content.m */; };
 		B176698C16AB52C9007965D0 /* DINCond-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = B176698B16AB52C9007965D0 /* DINCond-Bold.otf */; };
 		B176699016AB5FC2007965D0 /* Utility.m in Sources */ = {isa = PBXBuildFile; fileRef = B176698F16AB5FC1007965D0 /* Utility.m */; };
+		B17669A016ADC1D6007965D0 /* SwipeView.m in Sources */ = {isa = PBXBuildFile; fileRef = B176699F16ADC1D6007965D0 /* SwipeView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -85,6 +86,8 @@
 		B176698B16AB52C9007965D0 /* DINCond-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DINCond-Bold.otf"; sourceTree = "<group>"; };
 		B176698E16AB5FC1007965D0 /* Utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utility.h; sourceTree = "<group>"; };
 		B176698F16AB5FC1007965D0 /* Utility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Utility.m; sourceTree = "<group>"; };
+		B176699E16ADC1D6007965D0 /* SwipeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwipeView.h; sourceTree = "<group>"; };
+		B176699F16ADC1D6007965D0 /* SwipeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwipeView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -166,6 +169,7 @@
 		3FBB224316A9B78A008DBBF0 /* External Library */ = {
 			isa = PBXGroup;
 			children = (
+				B176699D16ADC1D6007965D0 /* SwipeView */,
 				3FBB228716A9C784008DBBF0 /* AFNetworking */,
 			);
 			path = "External Library";
@@ -218,6 +222,15 @@
 				B176698B16AB52C9007965D0 /* DINCond-Bold.otf */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		B176699D16ADC1D6007965D0 /* SwipeView */ = {
+			isa = PBXGroup;
+			children = (
+				B176699E16ADC1D6007965D0 /* SwipeView.h */,
+				B176699F16ADC1D6007965D0 /* SwipeView.m */,
+			);
+			path = SwipeView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -304,6 +317,7 @@
 				3FBB22AD16A9CABC008DBBF0 /* Page.m in Sources */,
 				3FBB22B016A9D84E008DBBF0 /* Content.m in Sources */,
 				B176699016AB5FC2007965D0 /* Utility.m in Sources */,
+				B17669A016ADC1D6007965D0 /* SwipeView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

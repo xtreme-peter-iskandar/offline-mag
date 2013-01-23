@@ -16,19 +16,18 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     MainViewController* vc = [[MainViewController alloc] initWithNibName:@"MainViewController" bundle:nil];
-    [[MagazineAPIManager sharedInstance] setDelegate:vc];
     
-    if(![[MagazineAPIManager sharedInstance] magazineDownloaded]){
-        
+//    if(![[MagazineAPIManager sharedInstance] magazineDownloaded]){
+//        NSLog(@"download mag");
+        [[MagazineAPIManager sharedInstance] setDelegate:vc];
         [[MagazineAPIManager sharedInstance] retrieveMagazineMetadata];
-    }else{
-        [vc displayMagazine];
-    }
+//    }else{
+//        NSLog(@"DO NOT download mag");
+//        [vc setQueueToDisplay:YES];
+//    }
     [self.window setRootViewController:vc];
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
-    NSString *directory = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
-    NSLog(@"Dir: %@",directory);
     return YES;
 }
 

@@ -11,6 +11,7 @@
 
 @interface MagazineMetaData : NSObject
 @property (nonatomic, strong) NSArray* pages;
+@property (nonatomic, strong) NSNumber* version;
 
 - (BOOL)populateObjectFromJSON:(NSDictionary*)data;
 @end

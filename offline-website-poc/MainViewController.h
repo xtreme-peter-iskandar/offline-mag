@@ -8,9 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import "MagazineAPIManager.h"
+#import "SwipeView.h"
 
-@interface MainViewController : UIViewController<UIWebViewDelegate,MagazineAPIManagerDelegate>
-@property (weak, nonatomic) IBOutlet UIWebView *mainWebView;
+@interface MainViewController : UIViewController<UIWebViewDelegate,MagazineAPIManagerDelegate, SwipeViewDataSource, SwipeViewDelegate>
+@property (nonatomic, strong) SwipeView* swipeView;
+@property (nonatomic, assign) BOOL queueToDisplay;
 
 - (void) displayMagazine;
 

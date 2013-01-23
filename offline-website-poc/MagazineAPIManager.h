@@ -11,6 +11,8 @@
 #import "MagazineMetaData.h"
 #import "Utility.h"
 
+#define kMAGAZINE_DOWNLOADED @"MAGAZINE_DOWNLOADED"
+#define kMAGAZINE_VERSION @"MAGAZINE_VERSION"
 @protocol MagazineAPIManagerDelegate <NSObject>
 @optional
 - (void) magazineMetadataLoaded;
